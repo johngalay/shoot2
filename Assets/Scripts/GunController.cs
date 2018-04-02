@@ -29,12 +29,16 @@ public class GunController : MonoBehaviour {
 	private float timeLeft = 0f;
 	public Transform firePoint;
 
+	public AudioSource gunSound;
+	public AudioSource gunReload;
+
 	public Text currentAmmoText;
 	public Text totalAmmoText;
 
 	// Use this for initialization
 	void Start () {
 		currentAmmo = maxAmmo;
+		
 	}
 
 	void OnEnable() {
@@ -78,6 +82,9 @@ public class GunController : MonoBehaviour {
 	void Shoot() {
 		isFiring = true;
 		currentAmmo--;
+		
+		gunSound.Play();
+
 		BulletController newBullet = Instantiate(bullet, firePoint.position, bulletRotation(spreadAngle)) as BulletController;
 		newBullet.speed = bulletSpeed;
 	}
@@ -95,6 +102,8 @@ public class GunController : MonoBehaviour {
 			Debug.Log("Failed to reload..."); // for debugging
 		} else {
 			Debug.Log("Reloading..."); // for debugging
+
+			gunReload.Play();
 
 			yield return new WaitForSeconds(reloadTime - 0.25f);
 			
