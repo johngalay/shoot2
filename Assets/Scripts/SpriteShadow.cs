@@ -19,9 +19,12 @@ public class SpriteShadow : MonoBehaviour {
 		transCaster = transform;
 		// create new game object and assigning game object transform to transShadow.
 		transShadow = new GameObject().transform;
-		transShadow.parent = transCaster;
-		transShadow.gameObject.name = "shadow";
-		transShadow.localRotation = Quaternion.identity;
+		transShadow.localScale = transCaster.localScale;	// sets scale same to caster (set before parenting)
+
+		transShadow.parent = transCaster;					// parents shadow to caster
+		transShadow.gameObject.name = "shadow";				// gives name to shadow
+		transShadow.localRotation = Quaternion.identity;	// sets rotation same to caster
+		
 
 		// sprite renderer on the main object script is attached to.
 		sprRndCaster = GetComponent<SpriteRenderer>();

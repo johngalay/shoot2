@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void OnCollisionEnter2D(Collision2D coll) {
-		Debug.Log("player contact");
+		Debug.Log("Player in contact with something.");
 	}
 
 	/*
