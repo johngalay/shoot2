@@ -1,142 +1,194 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GunController : MonoBehaviour {
- 
-	public bool isFiring;
 
-	public float damage = 10f;
-	public float recoil = 2f;
-	public float range = 50f;
-
-	public float spreadAngle = 0f;
-
-	public int totalAmmo = 60; // total gun ammo
-	public int maxAmmo = 8; // max magazine ammo
-	private int currentAmmo;
-	public float reloadTime = 1f;
-	private bool isReloading = false;
-	private bool isEmpty = false;
-
-	public LayerMask whatToHit;
-
-	public BulletController bullet;
-	public float bulletSpeed;
-
-	public float shootWaitTime = 0.5f;
-	private float timeLeft = 0f;
 	public Transform firePoint;
-
+	[SerializeField] private float shootWaitTime = 0.5f;
+	private float timeLeft = 0f;
 	public AudioSource gunSound;
-	public AudioSource gunReload;
+	public MoveTrail bullet;
+	[HideInInspector] public float distanceToTravel;
+	public bool isShooting = false;
+	[SerializeField] private int gunDamage = 10;
 
-	public Text currentAmmoText;
-	public Text totalAmmoText;
+	private Rigidbody2D myRigidbody;
+	private Camera viewCamera;
 
-	// Use this for initialization
-	void Start () {
-		currentAmmo = maxAmmo;
-		
-	}
-
-	void OnEnable() {
-		isReloading = false;
-		isFiring = false;
-	}
+	private PhotonView myPhotonView;
+	private float lastShootTime;
+	private int lastProjectileId;
 	
-	// Update is called once per frame
-	void Update () {
 
-		currentAmmoText.text = currentAmmo.ToString();
-		totalAmmoText.text = totalAmmo.ToString();
+	void Start () {
+		myPhotonView = GetComponent<PhotonView>();
+		myRigidbody = GetComponent<Rigidbody2D>();
+		viewCamera = Camera.main;
+	}
+	/* 
 
-		if(isEmpty) {
-			//Debug.Log("No Ammo"); 
-			return;
-		}
-
-		if(isReloading) {
-			return;
-		}
-
-		if(currentAmmo <= 0) {
-			StartCoroutine(Reload());
-			return;
-		}
-
+	void LateUpdate() {
 		timeLeft -= Time.deltaTime;
 		if(timeLeft < 0) {
 			timeLeft = 0;
 		}
 
-		if(Input.GetButton("Fire1") && timeLeft <=	 0) {
+		if(Input.GetButton("Fire1") && timeLeft <= 0){
 			Shoot();
 			timeLeft = shootWaitTime;
-		}else {
-			isFiring = false;
+		}
+	}*/
+	void Update() {
+		isShooting = false;
+		if(Input.GetButton("Fire1")){
+			isShooting = true;
 		}
 	}
-	
+	void LateUpdate() {
+		if(isShooting) {
+			UpdateShoot();
+		}
+	}
+
+	// outdated
+	/*
 	void Shoot() {
-		isFiring = true;
-		currentAmmo--;
-		
+		Vector3 pointToLook = viewCamera.ScreenToWorldPoint(Input.mousePosition);
+		Vector2 direction = new Vector2(
+			pointToLook.x - transform.position.x,
+			pointToLook.y - transform.position.y
+		);
+
 		gunSound.Play();
-
-		BulletController newBullet = Instantiate(bullet, firePoint.position, bulletRotation(spreadAngle)) as BulletController;
-		newBullet.speed = bulletSpeed;
-	}
-
-	// coroutine
-	IEnumerator Reload() {
 		
-		isReloading = true;
-		isFiring = false;
+		RaycastHit2D hit = Physics2D.Raycast(firePoint.position, direction);
 
-		
+		Effect();
 
-		if(totalAmmo <= 0) {
-			isEmpty = true;
-			Debug.Log("Failed to reload..."); // for debugging
-		} else {
-			Debug.Log("Reloading..."); // for debugging
+		distanceToTravel = hit.distance;
 
-			gunReload.Play();
-
-			yield return new WaitForSeconds(reloadTime - 0.25f);
-			
-			if(totalAmmo >= maxAmmo) {
-				totalAmmo -= maxAmmo;
-				currentAmmo = maxAmmo;
-			} else {
-				currentAmmo = totalAmmo;
-				totalAmmo = 0;
-			}
-		
-			yield return new WaitForSeconds(0.25f);
-			
+		if(hit.collider != null && 
+		(hit.collider.gameObject.layer == LayerMask.NameToLayer("Obstacle") || 
+		hit.collider.gameObject.layer == LayerMask.NameToLayer("Target"))) {
+			Debug.Log("We hit " + hit.collider.name + " Distance: " + hit.distance);
 		}
-
-		isReloading = false;	
-		
 	}
 
-	Quaternion bulletRotation(float spreadAngle) {
-		spreadAngle = spreadAngle / 2;
-		Quaternion bulletRotation;
-		Vector3 sp = Camera.main.WorldToScreenPoint(transform.position);
-		Vector3 direction = (Input.mousePosition - sp).normalized;
-				
-		// Calculate the angle
-		float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-    	//float spread = Random.Range(-90, -90);  // no angle
-		//float spread = Random.Range(-45, -135); // 90 degree angle
-		float spread = Random.Range(-90 + spreadAngle, -90 - spreadAngle);
-		//Debug.Log(spread + 90); // for debugging
-		return bulletRotation =  Quaternion.Euler(new Vector3(0, 0, angle + spread));
+	void Effect() {
+		MoveTrail newBullet = Instantiate(bullet, firePoint.position, firePoint.rotation) as MoveTrail;
+	}
+	*/
+
+	void UpdateShoot() {
+		if(myPhotonView.isMine == false) {
+			return;
+		}
+		if(isShooting == false) {
+			return;
+		}
+		if(Time.realtimeSinceStartup - lastShootTime < shootWaitTime) {
+			return;
+		}
+		lastProjectileId++;
+		if(PhotonNetwork.offlineMode == true) {
+			Debug.Log("Offline");
+		}
+		else {
+			myPhotonView.RPC("OnShoot",
+							PhotonTargets.All,
+							new object[] {firePoint.position,
+										firePoint.rotation,
+										lastProjectileId,
+										GetDirection(),
+										firePoint.position,
+										distanceToTravel,
+										gunDamage
+										});
+		}	
+	}
+
+	public void CreateProjectile(Vector3 spawnPosition, Quaternion spawnRotation, double timestamp, int projectileId) {
+		lastShootTime = Time.realtimeSinceStartup;
+		MoveTrail newBullet = Instantiate(bullet, firePoint.position, firePoint.rotation) as MoveTrail;
+		newBullet.creationTime = timestamp;
+		newBullet.startPosition = spawnPosition;
+		newBullet.projectileId = projectileId;
+	}
+
+	public Vector2 GetDirection() {
+		Vector3 pointToLook = viewCamera.ScreenToWorldPoint(Input.mousePosition);
+		Vector2 direction = new Vector2(
+			pointToLook.x - transform.position.x,
+			pointToLook.y - transform.position.y
+		);	
+		return direction;
+	}
+
+	public void DetectTarget(Vector2 direction, Vector3 startRay, float distanceToTravel, int gunDamage) {
+		RaycastHit2D hit = Physics2D.Raycast(startRay, direction);
+		distanceToTravel = hit.distance;
+		if(hit.collider != null && 
+		(hit.collider.gameObject.layer == LayerMask.NameToLayer("Obstacle") || 
+		hit.collider.gameObject.layer == LayerMask.NameToLayer("Target"))) {
+
+			Debug.Log("We hit " + hit.collider.name + " Distance: " + hit.distance);
+
+			if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Target")) {
+				Debug.Log("Collider was a target");
+				hit.collider.gameObject.GetComponent<PhotonView>().RPC("Damage",
+																	PhotonTargets.OthersBuffered,
+																	gunDamage
+																	);
+			}
+		}
+	}
+
+	// outdated
+	/*
+	public void DetectTarget2() {
+		Vector3 pointToLook = viewCamera.ScreenToWorldPoint(Input.mousePosition);
+		Vector2 direction = new Vector2(
+			pointToLook.x - transform.position.x,
+			pointToLook.y - transform.position.y
+		);		
+		RaycastHit2D hit = Physics2D.Raycast(firePoint.position, direction);
+		distanceToTravel = hit.distance;
+		if(hit.collider != null && 
+		(hit.collider.gameObject.layer == LayerMask.NameToLayer("Obstacle") || 
+		hit.collider.gameObject.layer == LayerMask.NameToLayer("Target"))) {
+			Debug.Log("We hit " + hit.collider.name + " Distance: " + hit.distance);
+			if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Target")) {
+				Debug.Log("Collider was a target");
+				hit.collider.gameObject.GetComponent<PhotonView>().RPC("Damage",
+																	PhotonTargets.AllBuffered,
+																	new object[] {gunDamage
+																	});
+			}
+		}
+	}
+	*/
+	
+
+	[PunRPC]
+	public void OnShoot(Vector3 spawnPosition, Quaternion spawnRotation, int projectileId, 
+						Vector2 direction, Vector3 startRay, float distanceToTravel, int gunDamage,
+						PhotonMessageInfo info) {
+		gunSound.Play();
+		double timestamp = PhotonNetwork.time;
+		DetectTarget(direction, startRay, distanceToTravel, gunDamage);
+		CreateProjectile(spawnPosition, spawnRotation, timestamp, projectileId);
+	}
+
+	[PunRPC]
+	public void Damage(int damage, PhotonMessageInfo info) {
+		Debug.Log(info.sender);
+		info.photonView.GetComponent<PlayerNetwork>().playerHealth -= damage;
+	}
+
+	void ChatMessage() {
+		// the photonView.RPC() call is the same as without the info parameter.
+		// the info.sender is the player who called the RPC.
+		Debug.Log("RPC TEST!");
 	}
 }
-
-
