@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 
+<<<<<<< HEAD
 	public float moveSpeed = 3;
 <<<<<<< HEAD
 	private float startMoveSpeed;
@@ -13,55 +13,84 @@ public class PlayerController : MonoBehaviour {
 =======
 >>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 
+=======
+	public float moveSpeed;
+>>>>>>> parent of 6df1021... Multiplayer
 	private Rigidbody2D myRigidbody;
-	private Camera viewCamera;
-	private Vector2 velocity;
+	private Vector2 moveInput;
+	private Vector2 moveVelocity;
+
+	private Camera mainCamera;
+
+	public GunController theGun;
+
+	//public Texture2D cursorTexture;
+    //public CursorMode cursorMode = CursorMode.Auto;
+    //public Vector2 hotSpot = Vector2.zero;
 
 
 	void Start () {
+<<<<<<< HEAD
 <<<<<<< HEAD
 		startMoveSpeed = moveSpeed;
 =======
 >>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 		myRigidbody = GetComponent<Rigidbody2D>();
 		viewCamera = Camera.main;
+=======
+		// Gets the component type rigidbody attached to the script.
+		myRigidbody = GetComponent<Rigidbody2D>(); 
+		mainCamera = FindObjectOfType<Camera>();
+		//OnMouseEnter();
+>>>>>>> parent of 6df1021... Multiplayer
 	}
-	
+
 	void Update () {
+<<<<<<< HEAD
 <<<<<<< HEAD
 		
 		if(isRunning) {
 			moveSpeed = 7.5f;
 		} else {
 			moveSpeed = startMoveSpeed;
-		}
+=======
+		moveInput = new Vector2(Input.GetAxisRaw("Horizontal"),Input.GetAxisRaw("Vertical"));
 
-		Vector3 pointToLook = viewCamera.ScreenToWorldPoint(Input.mousePosition);
+		moveVelocity = moveInput * moveSpeed;
+		characterRotation();
+	}
+
+	void FixedUpdate () {
+		myRigidbody.velocity = moveVelocity;
+		if(theGun.isFiring) {
+			myRigidbody.velocity = GunRecoil();
+>>>>>>> parent of 6df1021... Multiplayer
+		}
+	}
+
+	void characterRotation () {
+		Vector3 pointToLook = mainCamera.ScreenToWorldPoint(Input.mousePosition);
 		Vector2 direction = new Vector2(
 			pointToLook.x - transform.position.x,
 			pointToLook.y - transform.position.y
 		);
-		transform.up = direction; 
-		velocity = new Vector2(Input.GetAxisRaw("Horizontal"),Input.GetAxisRaw("Vertical")).normalized * moveSpeed;
-		if(Mathf.Approximately(velocity.x, 0) && Mathf.Approximately(velocity.y, 0)) {
-			isMoving = false;
-		} else {
-			isMoving = true;
-		}
-		
-		if(isRunning && !isMoving) {
-			isRunning = false;
-		}
-		if(Input.GetKey(KeyCode.LeftShift)) {
-			isRunning = true;
-		}
+		transform.up = direction;
 	}
 
-	void FixedUpdate() {
-		myRigidbody.MovePosition(myRigidbody.position + velocity * Time.fixedDeltaTime);
+	Vector2 GunRecoil() {
+		Vector3 pointToLook = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+		Vector2 direction = new Vector2(
+			pointToLook.x - transform.position.x,
+			pointToLook.y - transform.position.y
+		);
+		return moveVelocity = -direction * theGun.recoil;
 	}
 
+	void OnCollisionEnter2D(Collision2D coll) {
+		Debug.Log("Player in contact with something.");
+	}
 
+<<<<<<< HEAD
 =======
 		Vector3 pointToLook = viewCamera.ScreenToWorldPoint(Input.mousePosition);
 		Vector2 direction = new Vector2(
@@ -118,4 +147,11 @@ public class PlayerController : MonoBehaviour {
 		MoveTrail newBullet = Instantiate(bullet, firePoint.position, firePoint.rotation) as MoveTrail;
 	}
 >>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
+=======
+	/*
+	void OnMouseEnter () {
+		Cursor.SetCursor(cursorTexture, hotSpot, cursorMode);
+	}
+	*/
+>>>>>>> parent of 6df1021... Multiplayer
 }
