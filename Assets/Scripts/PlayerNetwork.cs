@@ -8,7 +8,11 @@ public class PlayerNetwork : MonoBehaviour {
 	[SerializeField] private GameObject[] playerGameObjects;
 
 	private PhotonView photonView;
+<<<<<<< HEAD
 	public int playerHealth = 100;
+=======
+	public int playerHealth = 90;
+>>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 
 	private void Start() {
 		photonView = GetComponent<PhotonView>();
@@ -36,6 +40,7 @@ public class PlayerNetwork : MonoBehaviour {
 			return;
 		}
 
+<<<<<<< HEAD
 		if(playerHealth <= 0) {
 			GameObject.Find("GameLogic").GetComponent<PhotonNetworkManager>().Respawn(photonView, 1f);
 			photonView.gameObject.SetActive(false);
@@ -48,6 +53,13 @@ public class PlayerNetwork : MonoBehaviour {
 	}
 
 
+=======
+		if(Input.GetKeyDown(KeyCode.E)){
+			playerHealth = playerHealth - 5;
+		}
+	}
+
+>>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 	private void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
 		// send data
 		if(stream.isWriting) {

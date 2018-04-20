@@ -11,6 +11,7 @@ public class PhotonNetworkManager : Photon.MonoBehaviour {
 	[SerializeField] private Transform spawnPoint;
 	[SerializeField] private GameObject lobbyCamera;
 
+<<<<<<< HEAD
 	[Header ("X Spawn Range")]
 	public float xMin;
 	public float xMax;
@@ -25,6 +26,8 @@ public class PhotonNetworkManager : Photon.MonoBehaviour {
 		return pos;
 	}
 
+=======
+>>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 	// Use this for initialization
 	void Start () {
 		// connect to server
@@ -44,7 +47,11 @@ public class PhotonNetworkManager : Photon.MonoBehaviour {
 		lobbyCamera.SetActive(false);
 		
 		// spawn player
+<<<<<<< HEAD
 		PhotonView photonView = PhotonNetwork.Instantiate(player.name, GetSpawnPosition(), spawnPoint.rotation, 0).GetComponent<PhotonView>();
+=======
+		PhotonView photonView = PhotonNetwork.Instantiate(player.name, spawnPoint.position, spawnPoint.rotation, 0).GetComponent<PhotonView>();
+>>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 		// activate main cam
 		
 		PhotonView photonView2 = PhotonNetwork.Instantiate(mainCamera.name, lobbyCamera.transform.position, lobbyCamera.transform.rotation, 0).GetComponent<PhotonView>();
@@ -63,6 +70,7 @@ public class PhotonNetworkManager : Photon.MonoBehaviour {
 	void Update () {
 		connectText.text = PhotonNetwork.connectionStateDetailed.ToString();
 	}
+<<<<<<< HEAD
 	public void Respawn(PhotonView photonView, float timer) {
 		StartCoroutine(CoRespawn(photonView, timer));
 	}
@@ -81,4 +89,6 @@ public class PhotonNetworkManager : Photon.MonoBehaviour {
 
 		//}
 	}
+=======
+>>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 }

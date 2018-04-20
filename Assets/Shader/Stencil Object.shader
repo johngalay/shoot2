@@ -4,8 +4,11 @@
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness ("Smoothness", Range(0,1)) = 0.5
 		_Metallic ("Metallic", Range(0,1)) = 0.0
+<<<<<<< HEAD
 		_ColorMask ("Color Mask", Float) = 15
 		_AlphaTex ("Alpha mask (R)", 2D) = "white" {}
+=======
+>>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 	}
 	SubShader {
 		Tags { "RenderType"="Opaque"}
@@ -15,6 +18,7 @@
 			Ref 1
 			Comp equal 
 		}
+<<<<<<< HEAD
 		ColorMask [_ColorMask]
 
 		Pass {
@@ -25,6 +29,8 @@
                 Combine previous, texture
             }
 		}
+=======
+>>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 		
 		CGPROGRAM
 		// Physically based Standard lighting model, and enable shadows on all light types

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class GenerateObjectUI : MonoBehaviour {
 	private Rigidbody2D myRigidbody;
 	[SerializeField] private int myHealth;
+<<<<<<< HEAD
 	private int prevHealth;
 
 	private GameObject objectUI;
@@ -27,10 +28,25 @@ public class GenerateObjectUI : MonoBehaviour {
 
 		generateObjectUI();
 		//generateImageUI();
+=======
+	GameObject objectUI;
+	GameObject textUI;
+
+	void Start () {
+		
+		myRigidbody = this.GetComponentInParent<Rigidbody2D>();
+		myHealth = myRigidbody.gameObject.GetComponent<PlayerNetwork>().playerHealth;
+		
+		objectUI = new GameObject();
+		textUI = new GameObject();
+
+		generateObjectUI();
+>>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 	}
 	
 	void LateUpdate() {
 		myHealth = myRigidbody.gameObject.GetComponent<PlayerNetwork>().playerHealth;
+<<<<<<< HEAD
 		//if(myHealth != prevHealth){
 			//isDamaged = true;
 		//}
@@ -67,6 +83,10 @@ public class GenerateObjectUI : MonoBehaviour {
 		image.color = color;
 	}
 	*/
+=======
+		textUI.GetComponent<Text>().text = myHealth.ToString();	
+	}
+>>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 
 	void generateObjectUI() {
 		//GameObject objectUI = new GameObject();
@@ -95,7 +115,10 @@ public class GenerateObjectUI : MonoBehaviour {
 		health.text = "100";
 		health.enabled = true;
 		health.color = Color.white;
+<<<<<<< HEAD
 		health.GetComponent<Text>().material = targetMaterial;
+=======
+>>>>>>> a5bc8cd111e368efae651365d862ad46dbd60750
 
 		objectUI.name = "Text Label";
 		bool bWorldPosition = false;
